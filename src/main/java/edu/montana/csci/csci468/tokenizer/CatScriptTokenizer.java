@@ -75,8 +75,6 @@ public class CatScriptTokenizer {
     }
 
     private void scanSyntax() {
-        // TODO - implement rest of syntax scanning
-        //      - implement comments
         int start = postion;
         if(matchAndConsume('(')) {
             tokenList.addToken(LEFT_PAREN, "(", start, postion, line, lineOffset);
@@ -105,9 +103,16 @@ public class CatScriptTokenizer {
         else if(matchAndConsume('.')) {
             tokenList.addToken(DOT, ".", start, postion, line, lineOffset);
         }
+
         else if(matchAndConsume('/')) {
-            tokenList.addToken(SLASH, "/", start, postion, line, lineOffset);
-        }
+            if (matchAndConsume('/')) {
+                while (peek() != '\n' && !tokenizationEnd()){
+                    takeChar();
+                }
+            } else {
+                tokenList.addToken(SLASH, "/", start, postion, line, lineOffset);
+            }}
+
         else if(matchAndConsume('*')) {
             tokenList.addToken(STAR, "*", start, postion, line, lineOffset);
         }
