@@ -59,37 +59,6 @@ public class CatScriptTokenizer {
     }
 
 
-
-
-
-
-
-
-
-
-        /*   if(peek() == '\"' ) {
-            int start = postion;
-            postion++;
-            while (!tokenizationEnd()) {
-                if (isAlphaNumeric(peek())) {
-                    takeChar();
-                }
-
-                else if (peek() == '\"') {
-                    takeChar();
-                    String value = src.substring(start + 1, postion - 1);
-                    tokenList.addToken(STRING, value, start, postion, line, lineOffset);
-                    break;
-                }
-            }
-            return true;
-        }
-        return false;
-    }*/
-
-
-
-
     private boolean scanIdentifier() {
         if( isAlpha(peek())) {
             int start = postion;
