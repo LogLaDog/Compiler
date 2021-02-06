@@ -39,8 +39,21 @@ public class CatScriptTokenizer {
     }
 
     private boolean scanString() {
-        // TODO implement string scanning here!
-        return false;
+        if(peek() == '\"' && postion == 0) {
+            int start = postion;
+            postion++;
+            while (peek() != '\"' && !tokenizationEnd()) {
+                takeChar();
+            }
+
+            String value = src.substring(start, postion);
+            //System.out.print(value);
+            tokenList.addToken(STRING, value, start, postion, line, lineOffset);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     private boolean scanIdentifier() {
@@ -159,7 +172,6 @@ public class CatScriptTokenizer {
     }
 
     private void consumeWhitespace() {
-        // TODO update line and lineOffsets
         while (!tokenizationEnd()) {
             char c = peek();
             if (c == ' ' || c == '\r' || c == '\t') {
@@ -167,6 +179,8 @@ public class CatScriptTokenizer {
                 continue;
             } else if (c == '\n') {
                 postion++;
+                line++;
+                lineOffset++;
                 continue;
             }
             break;
