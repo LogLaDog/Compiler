@@ -39,27 +39,56 @@ public class CatScriptTokenizer {
     }
 
     private boolean scanString() {
-        if(peek() == '\"') {
+        if(peek() == '\"' ) {
+            int start = postion;
+            postion++;
+            while (peek() != '\"' && !tokenizationEnd()) {
+                takeChar();
+            }
+            if (tokenizationEnd()) {
+                tokenList.addToken(ERROR, "<Unterminated String", start, postion, line, lineOffset);
+            }
+            else {
+                takeChar();
+                String value = src.substring(start+1, postion-1 );
+                tokenList.addToken(STRING, value, start, postion, line, lineOffset);
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
+        /*   if(peek() == '\"' ) {
             int start = postion;
             postion++;
             while (!tokenizationEnd()) {
-                if(peek() != '\"') {
+                if (isAlphaNumeric(peek())) {
                     takeChar();
                 }
-                else if (peek() == '\"'){
+
+                else if (peek() == '\"') {
                     takeChar();
+                    String value = src.substring(start + 1, postion - 1);
+                    tokenList.addToken(STRING, value, start, postion, line, lineOffset);
                     break;
                 }
             }
-            String value = src.substring(start+1, postion-1);
-            //System.out.print(value);
-            tokenList.addToken(STRING, value, start, postion, line, lineOffset);
             return true;
         }
-        else {
-            return false;
-        }
-    }
+        return false;
+    }*/
+
+
+
 
     private boolean scanIdentifier() {
         if( isAlpha(peek())) {
