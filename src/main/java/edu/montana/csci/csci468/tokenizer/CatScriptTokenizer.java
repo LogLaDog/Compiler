@@ -42,15 +42,16 @@ public class CatScriptTokenizer {
         if(peek() == '\"') {
             int start = postion;
             postion++;
-            while (peek() != '\"' && !tokenizationEnd()) {
+            while (!tokenizationEnd()) {
                 if(peek() != '\"') {
                     takeChar();
                 }
                 else if (peek() == '\"'){
+                    takeChar();
                     break;
                 }
             }
-            String value = src.substring(start, postion);
+            String value = src.substring(start+1, postion-1);
             //System.out.print(value);
             tokenList.addToken(STRING, value, start, postion, line, lineOffset);
             return true;
