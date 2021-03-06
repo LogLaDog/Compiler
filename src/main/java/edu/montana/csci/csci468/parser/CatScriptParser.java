@@ -7,6 +7,9 @@ import edu.montana.csci.csci468.tokenizer.Token;
 import edu.montana.csci.csci468.tokenizer.TokenList;
 import edu.montana.csci.csci468.tokenizer.TokenType;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import static edu.montana.csci.csci468.tokenizer.TokenType.*;
 
 public class CatScriptParser {
@@ -77,18 +80,55 @@ public class CatScriptParser {
     //============================================================
 
     private Expression parseExpression() {
-        return parseAdditiveExpression();
+        return parseEqualityExpression();
+    }
+
+    private Expression parseEqualityExpression() {
+        Expression lhs = parseComparisonExpression();
+        if(tokens.match(EQUAL_EQUAL, BANG_EQUAL)) {
+            Token token = tokens.consumeToken();
+            Expression rhs = parseEqualityExpression();
+            return new EqualityExpression(token, lhs, rhs);
+        }
+        else {
+            return lhs;
+        }
+    }
+
+    private Expression parseComparisonExpression() {
+        Expression lhs = parseAdditiveExpression();
+        if(tokens.match(LESS_EQUAL)) {
+            Token token = tokens.consumeToken();
+            Expression rhs = parseComparisonExpression();
+            return new ComparisonExpression(token, lhs, rhs);
+        }
+        else {
+            return lhs;
+        }
     }
 
     private Expression parseAdditiveExpression() {
-        Expression expression = parseUnaryExpression();
+        Expression expression = parseFactorExpression();
         while (tokens.match(PLUS, MINUS)) {
             Token operator = tokens.consumeToken();
-            final Expression rightHandSide = parseUnaryExpression();
+            final Expression rightHandSide = parseFactorExpression();
             AdditiveExpression additiveExpression = new AdditiveExpression(operator, expression, rightHandSide);
             additiveExpression.setStart(expression.getStart());
             additiveExpression.setEnd(rightHandSide.getEnd());
             expression = additiveExpression;
+        }
+        return expression;
+    }
+
+    private Expression parseFactorExpression() {
+        Expression expression = parseUnaryExpression();
+        while (tokens.match(STAR, SLASH)) {
+            Token operator = tokens.consumeToken();
+            final Expression rightHandSide = parseUnaryExpression();
+            FactorExpression factorExpression = new FactorExpression(operator, expression, rightHandSide);
+            factorExpression.setStart(expression.getStart());
+            factorExpression.setEnd(rightHandSide.getEnd());
+            expression = factorExpression;
         }
         return expression;
     }
@@ -112,26 +152,77 @@ public class CatScriptParser {
             IntegerLiteralExpression integerExpression = new IntegerLiteralExpression(integerToken.getStringValue());
             integerExpression.setToken(integerToken);
             return integerExpression;
-        } else {
-            SyntaxErrorExpression syntaxErrorExpression = new SyntaxErrorExpression(tokens.consumeToken());
-            return syntaxErrorExpression;
+        } else if (tokens.match(STRING)) {
+            Token token = tokens.consumeToken();
+            StringLiteralExpression expr = new StringLiteralExpression(token.getStringValue());
+            expr.setToken(token);
+            return expr;
+        } else if (tokens.match(TRUE, FALSE)) {
+            Token token = tokens.consumeToken();
+            BooleanLiteralExpression expr = new BooleanLiteralExpression(token.getType() == TRUE);
+            expr.setToken(token);
+            return expr;
+        } else if (tokens.match(NULL)) {
+            Token token = tokens.consumeToken();
+            NullLiteralExpression expr = new NullLiteralExpression();
+            expr.setToken(token);
+            return expr;
+        } else if (tokens.match(IDENTIFIER)) {
+            Token start = tokens.consumeToken();
+            if (tokens.matchAndConsume(LEFT_PAREN)) {
+                //return parseFunctionCallExpression(start);
+            } else {
+                IdentifierExpression expr = new IdentifierExpression(start.getStringValue());
+                expr.setToken(start);
+                return expr;
+            }
         }
-    }
-
-    //============================================================
-    //  Parse Helpers
-    //============================================================
-    private Token require(TokenType type, ParseElement elt) {
-        return require(type, elt, ErrorType.UNEXPECTED_TOKEN);
-    }
-
-    private Token require(TokenType type, ParseElement elt, ErrorType msg) {
-        if(tokens.match(type)){
-            return tokens.consumeToken();
-        } else {
-            elt.addError(msg, tokens.getCurrentToken());
-            return tokens.getCurrentToken();
+            else if (tokens.match(LEFT_BRACKET)) {
+            Token start = tokens.consumeToken();
+            List<Expression> values = new LinkedList<>();
+            if (!tokens.match(RIGHT_BRACKET)) {
+                do {
+                    values.add(parseExpression());
+                } while (tokens.matchAndConsume(COMMA) && tokens.hasMoreTokens());
+            }
+            ListLiteralExpression expr = new ListLiteralExpression(values);
+            expr.setStart(start);
+            expr.setEnd(require(RIGHT_BRACKET, expr, ErrorType.UNTERMINATED_LIST));
+            return expr;
         }
+            else if (tokens.match(LEFT_PAREN)) {
+            Token start = tokens.consumeToken();
+            ParenthesizedExpression expr = new ParenthesizedExpression(parseExpression());
+            expr.setStart(start);
+            if (tokens.match(RIGHT_PAREN)) {
+                expr.setEnd(tokens.consumeToken());
+            } else {
+                expr.setEnd(tokens.consumeToken());
+                expr.addError(ErrorType.UNTERMINATED_LIST);
+            }
+            return expr;
+        }
+             else {
+                 SyntaxErrorExpression syntaxErrorExpression = new SyntaxErrorExpression(tokens.consumeToken());
+                return syntaxErrorExpression;
+            }
+        return null;
     }
 
-}
+        //============================================================
+        //  Parse Helpers
+        //============================================================
+        private Token require (TokenType type, ParseElement elt){
+            return require(type, elt, ErrorType.UNEXPECTED_TOKEN);
+        }
+
+        private Token require (TokenType type, ParseElement elt, ErrorType msg){
+            if (tokens.match(type)) {
+                return tokens.consumeToken();
+            } else {
+                elt.addError(msg, tokens.getCurrentToken());
+                return tokens.getCurrentToken();
+            }
+        }
+
+    }
