@@ -97,7 +97,7 @@ public class CatScriptParser {
 
     private Expression parseComparisonExpression() {
         Expression lhs = parseAdditiveExpression();
-        if(tokens.match(LESS_EQUAL)) {
+        if(tokens.match(LESS_EQUAL, GREATER_EQUAL, GREATER, LESS)) {
             Token token = tokens.consumeToken();
             Expression rhs = parseComparisonExpression();
             return new ComparisonExpression(token, lhs, rhs);
@@ -170,7 +170,7 @@ public class CatScriptParser {
         } else if (tokens.match(IDENTIFIER)) {
             Token start = tokens.consumeToken();
             if (tokens.matchAndConsume(LEFT_PAREN)) {
-                //return parseFunctionCallExpression(start);
+                return parseFunctionCallExpression(start);
             } else {
                 IdentifierExpression expr = new IdentifierExpression(start.getStringValue());
                 expr.setToken(start);
@@ -206,10 +206,23 @@ public class CatScriptParser {
                  SyntaxErrorExpression syntaxErrorExpression = new SyntaxErrorExpression(tokens.consumeToken());
                 return syntaxErrorExpression;
             }
-        return null;
     }
 
-        //============================================================
+    private Expression parseFunctionCallExpression(Token start) {
+        List<Expression> values = new LinkedList<>();
+        if (!tokens.match(RIGHT_PAREN)) {
+            do {
+                values.add(parseExpression());
+            } while (tokens.matchAndConsume(COMMA) && tokens.hasMoreTokens());
+        }
+        FunctionCallExpression expr = new FunctionCallExpression("foo", values);
+        expr.setStart(start);
+        expr.setEnd(require(RIGHT_PAREN, expr, ErrorType.UNTERMINATED_ARG_LIST));
+        return expr;
+    }
+
+
+    //============================================================
         //  Parse Helpers
         //============================================================
         private Token require (TokenType type, ParseElement elt){
