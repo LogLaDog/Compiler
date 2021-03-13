@@ -31,25 +31,36 @@ public class CatScriptTokenizer {
             return;
         }
         scanSyntax();
+
     }
+
     private boolean scanString() {
-        if(peek() == '\"' ) {
-            int start = postion;
-            postion++;
-            while (peek() != '\"' && !tokenizationEnd()) {
+        int start = postion;
+        if (matchAndConsume('"')) {
+            while (peek() != '"' && !tokenizationEnd()) {
+                if(matchAndConsume('\\')){
+                    if(!tokenizationEnd()){
+                        takeChar();
+                    }
+                    continue;
+                }
                 takeChar();
+                if (peek() == '\n') {
+                    line++;
+                }
             }
-            if (tokenizationEnd()) {
-                tokenList.addToken(ERROR, "<Unterminated String", start, postion, line, lineOffset);
+            if (matchAndConsume('"')) {
+                tokenList.addToken(STRING, src.substring(start + 1, postion - 1), start, postion, line, lineOffset);
+                lineOffset++;
+                return true;
             }
-            else {
-                takeChar();
-                String value = src.substring(start+1, postion-1 );
-                tokenList.addToken(STRING, value, start, postion, line, lineOffset);
-            }
+        }
+        if (tokenizationEnd()) {
+            tokenList.addToken(ERROR, "Unterminated string.", start, postion, line, lineOffset);
             return true;
         }
         return false;
+//
     }
 
 
@@ -165,11 +176,12 @@ public class CatScriptTokenizer {
             char c = peek();
             if (c == ' ' || c == '\r' || c == '\t') {
                 postion++;
+                lineOffset++;
                 continue;
             } else if (c == '\n') {
                 postion++;
                 line++;
-                lineOffset++;
+                lineOffset=0;
                 continue;
             }
             break;
@@ -188,14 +200,18 @@ public class CatScriptTokenizer {
                 c == '_';
     }
     private boolean isAlphaNumeric(char c) {
+
         return isAlpha(c) || isDigit(c);
     }
     private boolean isDigit(char c) {
         return c >= '0' && c <= '9';
     }
+
     private char takeChar() {
+        if (tokenizationEnd()) return '\0';
         char c = src.charAt(postion);
         postion++;
+        lineOffset++;
         return c;
     }
     private boolean tokenizationEnd() {
