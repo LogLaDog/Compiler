@@ -38,12 +38,15 @@ public class ComparisonExpression extends Expression {
     public boolean isLessThan() {
         return operator.getType().equals(LESS);
     }
+
     public boolean isLessThanOrEqual() {
         return operator.getType().equals(LESS_EQUAL);
     }
+
     public boolean isGreaterThanOrEqual() {
         return operator.getType().equals(GREATER_EQUAL);
     }
+
     public boolean isGreater() {
         return operator.getType().equals(GREATER);
     }
@@ -71,8 +74,47 @@ public class ComparisonExpression extends Expression {
 
     @Override
     public Object evaluate(CatscriptRuntime runtime) {
-        return super.evaluate(runtime);
+        Integer lhsValue = (Integer) leftHandSide.evaluate(runtime);
+        Integer rhsValue = (Integer) rightHandSide.evaluate(runtime);
+        //TODO handle string case
+        if (isGreater()) {
+            if (lhsValue > rhsValue) {
+                return true;
+            } else {
+                return false;
+            }
+        } else if (isGreaterThanOrEqual()) {
+            if (lhsValue > rhsValue || lhsValue == rhsValue) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        else if (isLessThanOrEqual()) {
+            if (lhsValue < rhsValue || lhsValue == rhsValue) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        else if (isLessThan()) {
+            if (lhsValue < rhsValue) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        else{
+            return false;
+        }
     }
+
+
+
+
 
     @Override
     public void transpile(StringBuilder javascript) {

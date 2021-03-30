@@ -59,11 +59,54 @@ public class CatScriptParser {
         if (forStmt != null) {
             return forStmt;
         }
+        Statement ifStmt = parseIfStatement();
+        if (ifStmt != null) {
+            return ifStmt;
+        }
         Statement varStm = parseVariableStatement();
         if(varStm != null){
             return varStm;
         }
+        Statement assignStm = parseAssignmentStatement();
+        if(assignStm != null){
+            return assignStm;
+        }
         return new SyntaxErrorStatement(tokens.consumeToken());
+    }
+
+    private Statement parseAssignmentStatement() {
+        if (tokens.match(IDENTIFIER)) {
+            AssignmentStatement assignmentStatement = new AssignmentStatement();
+            Token token = tokens.getCurrentToken();
+            assignmentStatement.setStart(tokens.consumeToken());
+            assignmentStatement.setVariableName(token.getStringValue());
+            require(EQUAL, assignmentStatement);
+            assignmentStatement.setExpression(parseExpression());
+            assignmentStatement.setEnd(require(RIGHT_PAREN, assignmentStatement));
+            return assignmentStatement;
+            }
+            else {
+                return null;
+            }
+        }
+
+    private Statement parseIfStatement() {
+        if (tokens.match(IF)) {
+            IfStatement ifStatement = new IfStatement();
+            ifStatement.setStart(tokens.consumeToken());
+            require(LEFT_PAREN, ifStatement);
+            require(IDENTIFIER, ifStatement);
+            ifStatement.setExpression(parseExpression());
+            require(RIGHT_PAREN, ifStatement);
+            require(LEFT_BRACE, ifStatement);
+            List<Statement> statements = new LinkedList<>();
+            statements.add(parseProgramStatement());
+            ifStatement.getTrueStatements();
+            Token token = require(RIGHT_BRACE, ifStatement);
+            ifStatement.setEnd(token);
+            return ifStatement;
+        }
+        return null;
     }
 
     private Statement parseVariableStatement() {
