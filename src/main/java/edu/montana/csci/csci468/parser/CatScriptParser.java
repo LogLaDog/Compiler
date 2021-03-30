@@ -69,16 +69,37 @@ public class CatScriptParser {
         if (ifStmt != null) {
             return ifStmt;
         }
-        Statement varStm = parseVariableStatement();
-        if(varStm != null){
-            return varStm;
-        }
         Statement assignStm = parseAssignmentStatement();
         if(assignStm != null){
             return assignStm;
         }
+        Statement fdStm = parseFunctionDefinitionStatement();
+        if(fdStm != null){
+            return fdStm;
+        }
+        Statement varStm = parseVariableStatement();
+        if(varStm != null){
+            return varStm;
+        }
         return new SyntaxErrorStatement(tokens.consumeToken());
     }
+
+    private Statement parseFunctionDefinitionStatement() {
+        if (tokens.match(FUNCTION)) {
+            FunctionDefinitionStatement fdStatement = new FunctionDefinitionStatement();
+            fdStatement.setStart(tokens.consumeToken());
+            Token name = require(IDENTIFIER, fdStatement);
+
+            fdStatement.setName(name.getStringValue());
+
+            require(LEFT_PAREN, fdStatement);
+            fdStatement.addParameter(null, null);
+
+            return fdStatement;
+        }
+        return null;
+    }
+
 
     private Statement parseAssignmentStatement() {
         if (tokens.match(IDENTIFIER)) {
@@ -128,12 +149,23 @@ public class CatScriptParser {
         if (tokens.match(VAR)) {
             VariableStatement variableStatement = new VariableStatement();
             variableStatement.setStart(tokens.consumeToken());
-            if (tokens.match(IDENTIFIER)) {
-                Token token = tokens.getCurrentToken();
-                variableStatement.setVariableName(token.getStringValue());
-            }
+            Token name = require(IDENTIFIER, variableStatement);
+            variableStatement.setVariableName(name.getStringValue()); //Why is this breaking it?
+            CatscriptType explicitType = null;
 
-            return variableStatement;
+            if (tokens.matchAndConsume(COLON)) {
+                variableStatement.setExpression(parseExpression());
+
+                variableStatement.setExplicitType(CatscriptType.INT);
+                require(EQUAL, variableStatement);
+                variableStatement.setExpression(parseExpression());
+                return variableStatement;
+            }
+            else {
+                require(EQUAL, variableStatement);
+                variableStatement.setExpression(parseExpression());
+                return variableStatement;
+            }
         }
         return null;
     }

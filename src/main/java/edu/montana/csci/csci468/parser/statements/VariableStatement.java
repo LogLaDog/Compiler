@@ -49,14 +49,12 @@ public class VariableStatement extends Statement {
             addError(ErrorType.DUPLICATE_NAME);
         } else {
             if (variableName != null){
-
                 this.type = explicitType;
-
-                if (this.type.isAssignableFrom(type));
+               /* if (this.type.isAssignableFrom(expression.getType()));
+                {
                     addError(ErrorType.INCOMPATIBLE_TYPES);
                 }
-
-            else {
+            } else {*/
                 this.type = expression.getType();
             }
             symbolTable.registerSymbol(variableName, type);
