@@ -50,6 +50,12 @@ public class CatScriptParser {
     //  Statements
     //============================================================
 
+    /*                Token token = tokens.getCurrentToken();
+                System.out.println(token);
+
+                */
+
+
     private Statement parseProgramStatement() {
         Statement printStmt = parsePrintStatement();
         if (printStmt != null) {
@@ -96,18 +102,23 @@ public class CatScriptParser {
             ifStatement.setStart(tokens.consumeToken());
             require(LEFT_PAREN, ifStatement);
 
-            /*Expression lhs = ifStatement.setExpression(parseExpression());
-            Token operator = tokens.consumeToken();
-            Expression rhs = ifStatement.setExpression(parseExpression());
-            new ComparisonExpression(operator, lhs, rhs);
-            */
+            ifStatement.setExpression(parseExpression());
 
             require(RIGHT_PAREN, ifStatement);
             require(LEFT_BRACE, ifStatement);
+
             List<Statement> statements = new LinkedList<>();
             statements.add(parseProgramStatement());
-            ifStatement.getTrueStatements();
+            ifStatement.setTrueStatements(statements);
             require(RIGHT_BRACE, ifStatement);
+
+            if (tokens.match(ELSE)){
+                tokens.consumeToken();
+                Token token = tokens.getCurrentToken();
+                System.out.println(token);
+                require(LEFT_BRACE, ifStatement);
+                require(RIGHT_BRACE, ifStatement);
+            }
             return ifStatement;
         }
         return null;
