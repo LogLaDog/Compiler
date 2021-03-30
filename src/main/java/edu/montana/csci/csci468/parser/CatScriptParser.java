@@ -143,15 +143,20 @@ public class CatScriptParser {
             ForStatement forStatement = new ForStatement();
             forStatement.setStart(tokens.consumeToken());
             require(LEFT_PAREN, forStatement);
-            require(IDENTIFIER, forStatement);
+            Token loopIdentifier = require(IDENTIFIER, forStatement);
+
+            tokens.consumeToken();
+
             forStatement.setExpression(parseExpression());
+
             require(RIGHT_PAREN, forStatement);
             require(LEFT_BRACE, forStatement);
+
+            forStatement.setVariableName(loopIdentifier.getStringValue());
             List<Statement> statements = new LinkedList<>();
             statements.add(parseProgramStatement());
             forStatement.setBody(statements);
-            Token token = require(RIGHT_BRACE, forStatement);
-            forStatement.setEnd(token);
+            require(RIGHT_BRACE, forStatement);
             return forStatement;
         }
         return null;
