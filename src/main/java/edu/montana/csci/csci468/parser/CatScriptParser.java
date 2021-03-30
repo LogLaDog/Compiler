@@ -7,6 +7,7 @@ import edu.montana.csci.csci468.tokenizer.Token;
 import edu.montana.csci.csci468.tokenizer.TokenList;
 import edu.montana.csci.csci468.tokenizer.TokenType;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import static edu.montana.csci.csci468.tokenizer.TokenType.*;
@@ -73,7 +74,7 @@ public class CatScriptParser {
         if(assignStm != null){
             return assignStm;
         }
-        Statement fdStm = parseFunctionDefinitionStatement();
+        Statement fdStm = parseFunctionDeclaration();
         if(fdStm != null){
             return fdStm;
         }
@@ -84,21 +85,61 @@ public class CatScriptParser {
         return new SyntaxErrorStatement(tokens.consumeToken());
     }
 
-    private Statement parseFunctionDefinitionStatement() {
+    private Statement parseFunctionDeclaration() {
         if (tokens.match(FUNCTION)) {
-            FunctionDefinitionStatement fdStatement = new FunctionDefinitionStatement();
-            fdStatement.setStart(tokens.consumeToken());
-            Token name = require(IDENTIFIER, fdStatement);
+            FunctionDefinitionStatement fun = new FunctionDefinitionStatement();
+            fun.setStart(tokens.consumeToken());
+            String id = tokens.getCurrentToken().getStringValue();
+            fun.setName(id);
+            tokens.consumeToken();
+            require(LEFT_PAREN, fun);
+            while (!tokens.match(RIGHT_PAREN, LEFT_BRACE)) {
+                String param_name = tokens.consumeToken().getStringValue();
+                TypeLiteral typeLiteral = new TypeLiteral();
+                if (tokens.match(COLON)) {
+                    tokens.consumeToken();
+                    typeLiteral = parseTypeExpression();
+                } else {
+                    typeLiteral.setType(CatscriptType.OBJECT);
+                }
+                fun.addParameter(param_name, typeLiteral);
+                if (tokens.match(COMMA)) {
+                    tokens.consumeToken();
+                }
 
-            fdStatement.setName(name.getStringValue());
+            }
+            require(RIGHT_PAREN, fun);
+            TypeLiteral returnType = new TypeLiteral();
+            if (tokens.match(COLON)) {
+                tokens.consumeToken();
+                returnType = parseTypeExpression();
 
-            require(LEFT_PAREN, fdStatement);
-            fdStatement.addParameter(null, null);
+            } else {
+                returnType.setType(CatscriptType.VOID);
+            }
 
-            return fdStatement;
+            fun.setType(returnType);
+            require(LEFT_BRACE, fun);
+            ArrayList<Statement> arrayList = new ArrayList<>();
+            currentFunctionDefinition = fun;
+            while (!tokens.match(RIGHT_BRACE, EOF)) {
+                if (tokens.match(RETURN)) {
+                    arrayList.add(parseReturnStatement());
+                    break;
+                } else {
+                    arrayList.add(parseProgramStatement());
+
+                }
+            }
+            fun.setBody(arrayList);
+            require(RIGHT_BRACE, fun);
+            fun.setEnd(tokens.getCurrentToken());
+            return fun;
+
         }
         return null;
     }
+
 
 
     private Statement parseAssignmentStatement() {
@@ -150,18 +191,54 @@ public class CatScriptParser {
             VariableStatement variableStatement = new VariableStatement();
             variableStatement.setStart(tokens.consumeToken());
             Token name = require(IDENTIFIER, variableStatement);
-            variableStatement.setVariableName(name.getStringValue()); //Why is this breaking it?
-            CatscriptType explicitType = null;
+            variableStatement.setVariableName(name.getStringValue());
+
+            CatscriptType explicitTypeBoolean = CatscriptType.BOOLEAN;
+            CatscriptType explicitTypeInteger = CatscriptType.INT;
+            CatscriptType explicitTypeString = CatscriptType.STRING;
+            CatscriptType explicitTypeObject = CatscriptType.OBJECT;
+            String boolString = explicitTypeBoolean.toString();
+            String intString = explicitTypeInteger.toString();
+            String stringString = explicitTypeString.toString();
+            String objectString = explicitTypeObject.toString();
 
             if (tokens.matchAndConsume(COLON)) {
-                variableStatement.setExpression(parseExpression());
+                Token type = tokens.getCurrentToken();
+                String tokenType = type.getStringValue();
 
-                variableStatement.setExplicitType(CatscriptType.INT);
-                require(EQUAL, variableStatement);
-                variableStatement.setExpression(parseExpression());
-                return variableStatement;
-            }
-            else {
+                if (boolString.equals(tokenType)) {
+                    variableStatement.setExpression(parseExpression());
+                    variableStatement.setExplicitType(CatscriptType.BOOLEAN);
+                    require(EQUAL, variableStatement);
+                    variableStatement.setExpression(parseExpression());
+                    return variableStatement;
+                }
+
+                else if (intString.equals(tokenType)) {
+                    variableStatement.setExpression(parseExpression());
+                    variableStatement.setExplicitType(CatscriptType.INT);
+                    require(EQUAL, variableStatement);
+                    variableStatement.setExpression(parseExpression());
+                    return variableStatement;
+                }
+
+                else if (stringString.equals(tokenType)) {
+                    variableStatement.setExpression(parseExpression());
+                    variableStatement.setExplicitType(CatscriptType.STRING);
+                    require(EQUAL, variableStatement);
+                    variableStatement.setExpression(parseExpression());
+                    return variableStatement;
+                }
+
+                else if (objectString.equals(tokenType)) {
+                    variableStatement.setExpression(parseExpression());
+                    variableStatement.setExplicitType(CatscriptType.OBJECT);
+                    require(EQUAL, variableStatement);
+                    variableStatement.setExpression(parseExpression());
+                    return variableStatement;
+                }
+
+            } else {
                 require(EQUAL, variableStatement);
                 variableStatement.setExpression(parseExpression());
                 return variableStatement;
@@ -213,6 +290,8 @@ public class CatScriptParser {
     //============================================================
     //  Expressions
     //============================================================
+
+
 
     private Expression parseExpression() {
         return parseEqualityExpression();
@@ -354,6 +433,69 @@ public class CatScriptParser {
         expr.setStart(start);
         expr.setEnd(require(RIGHT_PAREN, expr, ErrorType.UNTERMINATED_ARG_LIST));
         return expr;
+    }
+
+    private Statement parseReturnStatement() {
+        ReturnStatement returnStatement = new ReturnStatement();
+        returnStatement.setStart(tokens.consumeToken());
+        if (!tokens.match(RIGHT_BRACE)) {
+            returnStatement.setExpression(parseExpression());
+
+        }
+        returnStatement.setEnd(tokens.getCurrentToken());
+        returnStatement.setFunctionDefinition(currentFunctionDefinition);
+
+        return returnStatement;
+    }
+
+    private TypeLiteral parseTypeExpression() {
+        Token currentToken = tokens.consumeToken();
+        TypeLiteral typeLiteral = new TypeLiteral();
+
+        String strval = currentToken.getStringValue();
+        if (strval.equals("int")) {
+
+            typeLiteral.setType(CatscriptType.INT);
+            return typeLiteral;
+        } else if (strval.equals("string")) {
+
+            typeLiteral.setType(CatscriptType.STRING);
+            return typeLiteral;
+        } else if (strval.equals("bool")) {
+
+            typeLiteral.setType(CatscriptType.BOOLEAN);
+            return typeLiteral;
+        } else if (strval.equals("object")) {
+
+            typeLiteral.setType(CatscriptType.OBJECT);
+            return typeLiteral;
+        } else {
+            if (tokens.match(LESS)) {
+
+                //variableStatement.setExplicitType(CatscriptType.getListType(CatscriptType.INT));
+                tokens.consumeToken();
+                String check_against_me_too = tokens.consumeToken().getStringValue();
+
+                if (check_against_me_too.equals("int")) {
+                    typeLiteral.setType(CatscriptType.getListType(CatscriptType.INT));
+                } else if (check_against_me_too.equals("bool")) {
+                    typeLiteral.setType(CatscriptType.getListType(CatscriptType.BOOLEAN));
+                } else if (check_against_me_too.equals("string")) {
+                    typeLiteral.setType(CatscriptType.getListType(CatscriptType.STRING));
+                } else if (check_against_me_too.equals("object")) {
+                    typeLiteral.setType(CatscriptType.getListType(CatscriptType.OBJECT));
+                }
+                // dynamically check here
+
+                tokens.consumeToken();
+            } else {
+                typeLiteral.setType(CatscriptType.getListType(CatscriptType.OBJECT));
+            }
+
+            return typeLiteral;
+        }
+
+
     }
 
 

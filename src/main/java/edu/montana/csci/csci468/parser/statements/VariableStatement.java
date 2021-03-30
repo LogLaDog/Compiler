@@ -47,7 +47,9 @@ public class VariableStatement extends Statement {
         expression.validate(symbolTable);
         if (symbolTable.hasSymbol(variableName)) {
             addError(ErrorType.DUPLICATE_NAME);
-        } else {
+        }
+
+        else {
             if (variableName != null){
                 this.type = explicitType;
                /* if (this.type.isAssignableFrom(expression.getType()));
