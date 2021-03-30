@@ -95,15 +95,19 @@ public class CatScriptParser {
             IfStatement ifStatement = new IfStatement();
             ifStatement.setStart(tokens.consumeToken());
             require(LEFT_PAREN, ifStatement);
-            require(IDENTIFIER, ifStatement);
-            ifStatement.setExpression(parseExpression());
+
+            /*Expression lhs = ifStatement.setExpression(parseExpression());
+            Token operator = tokens.consumeToken();
+            Expression rhs = ifStatement.setExpression(parseExpression());
+            new ComparisonExpression(operator, lhs, rhs);
+            */
+
             require(RIGHT_PAREN, ifStatement);
             require(LEFT_BRACE, ifStatement);
             List<Statement> statements = new LinkedList<>();
             statements.add(parseProgramStatement());
             ifStatement.getTrueStatements();
-            Token token = require(RIGHT_BRACE, ifStatement);
-            ifStatement.setEnd(token);
+            require(RIGHT_BRACE, ifStatement);
             return ifStatement;
         }
         return null;

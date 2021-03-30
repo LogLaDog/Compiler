@@ -73,6 +73,7 @@ public class IfStatement extends Statement {
         super.execute(runtime);
     }
 
+
     @Override
     public void transpile(StringBuilder javascript) {
         super.transpile(javascript);

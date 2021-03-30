@@ -66,6 +66,8 @@ public class FunctionCallExpression extends Expression {
 
     @Override
     public Object evaluate(CatscriptRuntime runtime) {
+        FunctionDefinitionStatement function = getProgram().getFunction(name);
+        //function.invoke(runtime, arguments);
         return super.evaluate(runtime);
     }
 
