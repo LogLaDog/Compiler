@@ -294,7 +294,7 @@ public class CatScriptParser {
 
             forStatement.setVariableName(loopIdentifier.getStringValue());
             List<Statement> statements = new LinkedList<>();
-
+//what
             while(tokens.match(EOF) != true) {
                 statements.add(parseProgramStatement());
                 require(RIGHT_BRACE, forStatement);
