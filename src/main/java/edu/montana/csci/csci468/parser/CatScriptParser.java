@@ -56,42 +56,71 @@ public class CatScriptParser {
         if (printStmt != null) {
             return printStmt;
         }
-        Statement forStmt = parseForStatement();
-        if (forStmt != null) {
-            return forStmt;
+        if (tokens.match(FOR)) {
+        return parseForStatement();
         }
-        Statement ifStmt = parseIfStatement();
-        if (ifStmt != null) {
-            return ifStmt;
+        if (tokens.match(IF)) {
+            return parseIfStatement();
         }
-        Statement fdStm = parseFunctionDeclaration();
-        if(fdStm != null){
-            return fdStm;
+        if (tokens.match(FUNCTION)) {
+            return parseFunctionDeclaration();
         }
-        Statement varStm = parseVariableStatement();
-        if(varStm != null){
-            return varStm;
+        if (tokens.match(VAR)) {
+            return parseVariableStatement();
+        }
+        if (tokens.match(IDENTIFIER)) {
+            Token token = tokens.getCurrentToken();
+            tokens.consumeToken();
+
+            Token token2 = tokens.getCurrentToken();
+            String equalCheck = token2.getStringValue();
+
+            if(equalCheck.equals("=")){
+
+                AssignmentStatement assignmentStatement = new AssignmentStatement();
+                assignmentStatement.setStart(token);
+                assignmentStatement.setToken(token2);
+                tokens.consumeToken();
+                assignmentStatement.setVariableName(token.getStringValue());
+
+                Token token3 = tokens.getCurrentToken();
+                String token3String = token3.getStringValue();
+
+                if (token3String.equals("true")) {
+                    assignmentStatement.setExpression(parseExpression());
+                    assignmentStatement.addError(ErrorType.INCOMPATIBLE_TYPES);
+                    return assignmentStatement;
+                } else {
+                    assignmentStatement.setExpression(parseExpression());
+                    assignmentStatement.setEnd(require(RIGHT_PAREN, assignmentStatement));
+                    return assignmentStatement;
+                }
+            }
+
+            else {
+                List<Expression> values = new LinkedList<>();
+                if (!tokens.match(RIGHT_PAREN)) {
+                    do {
+                        values.add(parseExpression());
+                        values.add(parseExpression());
+                        values.add(parseExpression());
+                    } while (tokens.matchAndConsume(COMMA) && tokens.hasMoreTokens());
+                }
+                FunctionCallExpression expr = new FunctionCallExpression(token.getStringValue(), values);
+                expr.setStart(token);
+                expr.setEnd(require(RIGHT_PAREN, expr, ErrorType.UNTERMINATED_ARG_LIST));
+
+                FunctionCallStatement fcStatement = new FunctionCallStatement(expr);
+                return fcStatement;
+            }
         }
 
-        Statement assignStm = parseAssignmentStatement();
-        if(assignStm != null){
-            return assignStm;
-        }
-        Statement fcStm = parseFunctionCallStatement();
-        if(fcStm != null){
-            return fcStm;
-        }
 
         return new SyntaxErrorStatement(tokens.consumeToken());
     }
 
-    private Statement parseFunctionCallStatement() {
-        return null;
-    }
-
 
     private Statement parseFunctionDeclaration() {
-        if (tokens.match(FUNCTION)) {
             FunctionDefinitionStatement fun = new FunctionDefinitionStatement();
             fun.setStart(tokens.consumeToken());
             String id = tokens.getCurrentToken().getStringValue();
@@ -140,40 +169,12 @@ public class CatScriptParser {
             require(RIGHT_BRACE, fun);
             fun.setEnd(tokens.getCurrentToken());
             return fun;
-
-        }
-        return null;
     }
 
 
 
-    private Statement parseAssignmentStatement() {
-        if (tokens.match(IDENTIFIER)) {
-            AssignmentStatement assignmentStatement = new AssignmentStatement();
-            Token token = tokens.getCurrentToken();
-            assignmentStatement.setStart(tokens.consumeToken());
-            assignmentStatement.setVariableName(token.getStringValue());
-            require(EQUAL, assignmentStatement);
-            Token token2 = tokens.getCurrentToken();
-            String token2String = token2.getStringValue();
-
-            if (token2String.equals("true")) {
-                assignmentStatement.setExpression(parseExpression());
-                assignmentStatement.addError(ErrorType.INCOMPATIBLE_TYPES);
-                return assignmentStatement;
-            } else {
-                assignmentStatement.setExpression(parseExpression());
-                assignmentStatement.setEnd(require(RIGHT_PAREN, assignmentStatement));
-                return assignmentStatement;
-            }
-        }
-            else {
-                return null;
-            }
-        }
 
     private Statement parseIfStatement() {
-        if (tokens.match(IF)) {
             IfStatement ifStatement = new IfStatement();
             ifStatement.setStart(tokens.consumeToken());
             require(LEFT_PAREN, ifStatement);
@@ -207,12 +208,9 @@ public class CatScriptParser {
                 }
             }
             return ifStatement;
-        }
-        return null;
     }
 
     private Statement parseVariableStatement() {
-        if (tokens.match(VAR)) {
             VariableStatement variableStatement = new VariableStatement();
             variableStatement.setStart(tokens.consumeToken());
             Token name = require(IDENTIFIER, variableStatement);
@@ -277,12 +275,11 @@ public class CatScriptParser {
                 variableStatement.setExpression(parseExpression());
                 return variableStatement;
             }
-        }
         return null;
     }
 
     private Statement parseForStatement() {
-        if (tokens.match(FOR)) {
+
             ForStatement forStatement = new ForStatement();
             forStatement.setStart(tokens.consumeToken());
             require(LEFT_PAREN, forStatement);
@@ -301,8 +298,6 @@ public class CatScriptParser {
             forStatement.setBody(statements);
             require(RIGHT_BRACE, forStatement);
             return forStatement;
-        }
-        return null;
     }
 
     private Statement parsePrintStatement() {
