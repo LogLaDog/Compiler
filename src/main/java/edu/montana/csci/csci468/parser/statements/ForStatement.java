@@ -75,7 +75,7 @@ public class ForStatement extends Statement {
     public void execute(CatscriptRuntime runtime) {
         List evaluate = (List) expression.evaluate(runtime);
         for (Object o : evaluate){
-            runtime.setValue("1", o );
+            runtime.setValue(getVariableName(), o );
             for (Statement statement : body){
                 statement.execute(runtime);
             }

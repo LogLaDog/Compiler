@@ -71,9 +71,9 @@ public class IfStatement extends Statement {
     @Override
     public void execute(CatscriptRuntime runtime) {
         if(trueStatements != null){
-
+            expression.evaluate(runtime);
         }
-    }
+        }
 
 
     @Override
