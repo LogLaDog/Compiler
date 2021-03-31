@@ -51,12 +51,6 @@ public class CatScriptParser {
     //  Statements
     //============================================================
 
-    /*                Token token = tokens.getCurrentToken();
-                System.out.println(token);
-
-                */
-
-
     private Statement parseProgramStatement() {
         Statement printStmt = parsePrintStatement();
         if (printStmt != null) {
@@ -179,6 +173,9 @@ public class CatScriptParser {
                 Token token = tokens.getCurrentToken();
                 System.out.println(token);
                 require(LEFT_BRACE, ifStatement);
+                List<Statement> elseState = new LinkedList<>();
+                elseState.add(parseProgramStatement());
+                ifStatement.setElseStatements(elseState);
                 require(RIGHT_BRACE, ifStatement);
             }
             return ifStatement;
