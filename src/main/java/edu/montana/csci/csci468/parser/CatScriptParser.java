@@ -488,7 +488,6 @@ public class CatScriptParser {
             typeLiteral.setType(CatscriptType.INT);
             return typeLiteral;
         } else if (strval.equals("string")) {
-
             typeLiteral.setType(CatscriptType.STRING);
             return typeLiteral;
         } else if (strval.equals("bool")) {
