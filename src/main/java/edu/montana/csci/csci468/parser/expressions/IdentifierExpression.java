@@ -40,7 +40,8 @@ public class IdentifierExpression extends Expression {
 
     @Override
     public Object evaluate(CatscriptRuntime runtime) {
-        return name;
+        Object value = runtime.getValue(name);
+        return value;
     }
 
     @Override

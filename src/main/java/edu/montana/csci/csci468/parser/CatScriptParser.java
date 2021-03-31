@@ -294,11 +294,18 @@ public class CatScriptParser {
 
             forStatement.setVariableName(loopIdentifier.getStringValue());
             List<Statement> statements = new LinkedList<>();
-            statements.add(parseProgramStatement());
+
+            while(tokens.match(EOF) != true) {
+                statements.add(parseProgramStatement());
+                require(RIGHT_BRACE, forStatement);
+            }
+
             forStatement.setBody(statements);
-            require(RIGHT_BRACE, forStatement);
+
             return forStatement;
-    }
+
+        }
+
 
     private Statement parsePrintStatement() {
         if (tokens.match(PRINT)) {
