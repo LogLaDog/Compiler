@@ -283,28 +283,27 @@ public class CatScriptParser {
             ForStatement forStatement = new ForStatement();
             forStatement.setStart(tokens.consumeToken());
             require(LEFT_PAREN, forStatement);
-            Token loopIdentifier = require(IDENTIFIER, forStatement);
-
+            forStatement.setVariableName(tokens.getCurrentToken().getStringValue());
             tokens.consumeToken();
+            if (tokens.match(IN)) {
+                tokens.consumeToken();
+                if (tokens.match(LEFT_BRACKET)) {
+                    forStatement.setExpression(parseExpression());
+                    require(RIGHT_PAREN, forStatement);
+                    require(LEFT_BRACE, forStatement);
+                    ArrayList<Statement> forlist = new ArrayList();
+                    while (!tokens.match(RIGHT_BRACE, EOF)) {
+                        forlist.add(parseProgramStatement());
 
-            forStatement.setExpression(parseExpression());
+                    }
 
-            require(RIGHT_PAREN, forStatement);
-            require(LEFT_BRACE, forStatement);
-
-            forStatement.setVariableName(loopIdentifier.getStringValue());
-            List<Statement> statements = new LinkedList<>();
-//what
-            while(tokens.match(EOF) != true) {
-                statements.add(parseProgramStatement());
-                require(RIGHT_BRACE, forStatement);
+                    forStatement.setBody(forlist);
+                    forStatement.setEnd(require(RIGHT_BRACE, forStatement));
+                }
             }
-
-            forStatement.setBody(statements);
-
             return forStatement;
 
-        }
+    }
 
 
     private Statement parsePrintStatement() {
