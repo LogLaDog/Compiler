@@ -76,16 +76,13 @@ public class CatScriptParser {
             String equalCheck = token2.getStringValue();
 
             if(equalCheck.equals("=")){
-
                 AssignmentStatement assignmentStatement = new AssignmentStatement();
                 assignmentStatement.setStart(token);
                 assignmentStatement.setToken(token2);
                 tokens.consumeToken();
                 assignmentStatement.setVariableName(token.getStringValue());
-
                 Token token3 = tokens.getCurrentToken();
                 String token3String = token3.getStringValue();
-
                 if (token3String.equals("true")) {
                     assignmentStatement.setExpression(parseExpression());
                     assignmentStatement.addError(ErrorType.INCOMPATIBLE_TYPES);
@@ -99,6 +96,9 @@ public class CatScriptParser {
 
             else {
                 List<Expression> values = new LinkedList<>();
+
+
+
                 if (!tokens.match(RIGHT_PAREN)) {
                     do {
                         values.add(parseExpression());
@@ -108,7 +108,7 @@ public class CatScriptParser {
                 }
                 FunctionCallExpression expr = new FunctionCallExpression(token.getStringValue(), values);
                 expr.setStart(token);
-                expr.setEnd(require(RIGHT_PAREN, expr, ErrorType.UNTERMINATED_ARG_LIST));
+                require(RIGHT_PAREN, expr);
 
                 FunctionCallStatement fcStatement = new FunctionCallStatement(expr);
                 return fcStatement;
