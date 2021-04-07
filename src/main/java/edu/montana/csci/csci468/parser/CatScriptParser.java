@@ -228,7 +228,6 @@ public class CatScriptParser {
             if (tokens.matchAndConsume(COLON)) {
                 Token type = tokens.getCurrentToken();
                 String tokenType = type.getStringValue();
-
                 if (boolString.equals(tokenType)) {
                     variableStatement.setExpression(parseExpression());
                     variableStatement.setExplicitType(CatscriptType.BOOLEAN);
@@ -269,8 +268,21 @@ public class CatScriptParser {
                     variableStatement.setExpression(parseExpression());
                     return variableStatement;
                 }
+                else if (tokenType.equals("list")){
+                    tokens.consumeToken();
+                    require(LESS, variableStatement);
+                    variableStatement.setExplicitType(CatscriptType.getListType(CatscriptType.INT));
+                    tokens.consumeToken();
+                    require(GREATER, variableStatement);
+                    require(EQUAL, variableStatement);
+                    Token current = tokens.getCurrentToken();
+                    System.out.print(current);
+                    variableStatement.setExpression(parseExpression());
+                    return variableStatement;
 
-            } else {
+                }
+            }
+            else {
                 require(EQUAL, variableStatement);
                 variableStatement.setExpression(parseExpression());
                 return variableStatement;
