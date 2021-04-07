@@ -470,7 +470,7 @@ public class CatScriptParser {
         expr.setEnd(require(RIGHT_PAREN, expr, ErrorType.UNTERMINATED_ARG_LIST));
         return expr;
     }
-
+//w
     private Statement parseReturnStatement() {
         ReturnStatement returnStatement = new ReturnStatement();
         returnStatement.setStart(tokens.consumeToken());
