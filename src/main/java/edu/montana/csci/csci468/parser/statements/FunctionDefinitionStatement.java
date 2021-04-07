@@ -145,9 +145,7 @@ public class FunctionDefinitionStatement extends Statement {
     // Implementation
     //==============================================================
     @Override
-    public void execute(CatscriptRuntime runtime) {
-        super.execute(runtime);
-    }
+    public void execute(CatscriptRuntime runtime) { }
 
     @Override
     public void transpile(StringBuilder javascript) {
