@@ -1,0 +1,163 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< cs.msu.edu:CSCI_466_Project >---------------------
+[INFO] Building CSCI_466_Project 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ CSCI_466_Project ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 5 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ CSCI_466_Project ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ CSCI_466_Project ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/carson/Projects/msu/csci-466-spring2021/grading/scripts/repos/logan_ladd/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ CSCI_466_Project ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.22.1:test (default-test) @ CSCI_466_Project ---
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running edu.montana.csci.csci468.parser.CatscriptParserExpressionsTest
+[INFO] Tests run: 29, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.076 s - in edu.montana.csci.csci468.parser.CatscriptParserExpressionsTest
+[INFO] Running edu.montana.csci.csci468.parser.CatscriptParserErrorsTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 s - in edu.montana.csci.csci468.parser.CatscriptParserErrorsTest
+[INFO] Running edu.montana.csci.csci468.parser.CatscriptParserStatementsTest
+Token("["){type=LEFT_BRACKET, start=20, end=21, line=1, offset=20}[INFO] Tests run: 21, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.049 s - in edu.montana.csci.csci468.parser.CatscriptParserStatementsTest
+[INFO] Running edu.montana.csci.csci468.parser.CatscriptParserTypeCheckingTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.029 s - in edu.montana.csci.csci468.parser.CatscriptParserTypeCheckingTest
+[INFO] Running edu.montana.csci.csci468.parser.CatscriptParserSymbolCheckingTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s - in edu.montana.csci.csci468.parser.CatscriptParserSymbolCheckingTest
+[INFO] Running edu.montana.csci.csci468.eval.CatscriptStatementExecutionTest
+[ERROR] Tests run: 9, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.021 s <<< FAILURE! - in edu.montana.csci.csci468.eval.CatscriptStatementExecutionTest
+[ERROR] recursiveFunctionWorksProperly  Time elapsed: 0.01 s  <<< ERROR!
+java.lang.IndexOutOfBoundsException: Index 32 out of bounds for length 32
+	at edu.montana.csci.csci468.eval.CatscriptStatementExecutionTest.recursiveFunctionWorksProperly(CatscriptStatementExecutionTest.java:75)
+
+[ERROR] functionDeclarationWorksProperly  Time elapsed: 0.001 s  <<< ERROR!
+edu.montana.csci.csci468.parser.ParseErrorException: 
+Parse Errors Occurred:
+
+Line 4:foo(3)
+            ^
+
+Error: Unexpected Token
+
+Line 2:foo(1)
+      ^
+
+Error: Wrong number of arguments
+
+
+	at edu.montana.csci.csci468.eval.CatscriptStatementExecutionTest.functionDeclarationWorksProperly(CatscriptStatementExecutionTest.java:66)
+
+[INFO] Running edu.montana.csci.csci468.eval.CatscriptFunctionArgsAndReturnEvalTest
+[ERROR] Tests run: 14, Failures: 0, Errors: 9, Skipped: 0, Time elapsed: 0.02 s <<< FAILURE! - in edu.montana.csci.csci468.eval.CatscriptFunctionArgsAndReturnEvalTest
+[ERROR] listTypeWithComponentTypeArgWorksProperly  Time elapsed: 0 s  <<< ERROR!
+java.lang.IndexOutOfBoundsException: Index 27 out of bounds for length 27
+	at edu.montana.csci.csci468.eval.CatscriptFunctionArgsAndReturnEvalTest.listTypeWithComponentTypeArgWorksProperly(CatscriptFunctionArgsAndReturnEvalTest.java:56)
+
+[ERROR] stringTypeArgWorksProperly  Time elapsed: 0 s  <<< ERROR!
+java.lang.IndexOutOfBoundsException: Index 18 out of bounds for length 18
+	at edu.montana.csci.csci468.eval.CatscriptFunctionArgsAndReturnEvalTest.stringTypeArgWorksProperly(CatscriptFunctionArgsAndReturnEvalTest.java:44)
+
+[ERROR] noTypeArgWorksProperly  Time elapsed: 0 s  <<< ERROR!
+java.lang.IndexOutOfBoundsException: Index 16 out of bounds for length 16
+	at edu.montana.csci.csci468.eval.CatscriptFunctionArgsAndReturnEvalTest.noTypeArgWorksProperly(CatscriptFunctionArgsAndReturnEvalTest.java:20)
+
+[ERROR] mutliArgumentFunctionsWork  Time elapsed: 0.001 s  <<< ERROR!
+edu.montana.csci.csci468.parser.ParseErrorException: 
+Parse Errors Occurred:
+
+Line 1:function foo(x, y, z) { print(x) }foo(1, 2, 3)
+                                                  ^
+
+Error: Unexpected Token
+
+Line 1:function foo(x, y, z) { print(x) }foo(1, 2, 3)
+                                           ^
+
+Error: Unterminated list literal
+
+Line 1:function foo(x, y, z) { print(x) }foo(1, 2, 3)
+                                                ^
+
+Error: Unexpected Token
+
+Line 1:function foo(x, y, z) { print(x) }foo(1, 2, 3)
+                                                  ^
+
+Error: Unexpected Token
+
+Line 1:function foo(x, y, z) { print(x) }foo(1, 2, 3)
+                                                   ^
+
+Error: Unexpected Token
+
+
+	at edu.montana.csci.csci468.eval.CatscriptFunctionArgsAndReturnEvalTest.mutliArgumentFunctionsWork(CatscriptFunctionArgsAndReturnEvalTest.java:62)
+
+[ERROR] objectTypeArgWorksProperly  Time elapsed: 0 s  <<< ERROR!
+java.lang.IndexOutOfBoundsException: Index 18 out of bounds for length 18
+	at edu.montana.csci.csci468.eval.CatscriptFunctionArgsAndReturnEvalTest.objectTypeArgWorksProperly(CatscriptFunctionArgsAndReturnEvalTest.java:26)
+
+[ERROR] voidFunctionWorksProperly  Time elapsed: 0 s  <<< ERROR!
+java.lang.IndexOutOfBoundsException: Index 18 out of bounds for length 18
+	at edu.montana.csci.csci468.eval.CatscriptFunctionArgsAndReturnEvalTest.voidFunctionWorksProperly(CatscriptFunctionArgsAndReturnEvalTest.java:12)
+
+[ERROR] listTypeArgWorksProperly  Time elapsed: 0.002 s  <<< ERROR!
+java.lang.IndexOutOfBoundsException: Index 24 out of bounds for length 24
+	at edu.montana.csci.csci468.eval.CatscriptFunctionArgsAndReturnEvalTest.listTypeArgWorksProperly(CatscriptFunctionArgsAndReturnEvalTest.java:50)
+
+[ERROR] intTypeArgWorksProperly  Time elapsed: 0.002 s  <<< ERROR!
+java.lang.IndexOutOfBoundsException: Index 18 out of bounds for length 18
+	at edu.montana.csci.csci468.eval.CatscriptFunctionArgsAndReturnEvalTest.intTypeArgWorksProperly(CatscriptFunctionArgsAndReturnEvalTest.java:32)
+
+[ERROR] booleanTypeArgWorksProperly  Time elapsed: 0.002 s  <<< ERROR!
+java.lang.IndexOutOfBoundsException: Index 18 out of bounds for length 18
+	at edu.montana.csci.csci468.eval.CatscriptFunctionArgsAndReturnEvalTest.booleanTypeArgWorksProperly(CatscriptFunctionArgsAndReturnEvalTest.java:38)
+
+[INFO] Running edu.montana.csci.csci468.eval.CatscriptBasicExpressionEvalTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s - in edu.montana.csci.csci468.eval.CatscriptBasicExpressionEvalTest
+[INFO] Running edu.montana.csci.csci468.tokenizer.CatScriptTokenizerTest
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.022 s - in edu.montana.csci.csci468.tokenizer.CatScriptTokenizerTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   CatscriptFunctionArgsAndReturnEvalTest.booleanTypeArgWorksProperly:38->CatscriptTestBase.executeProgram:101 » IndexOutOfBounds
+[ERROR]   CatscriptFunctionArgsAndReturnEvalTest.intTypeArgWorksProperly:32->CatscriptTestBase.executeProgram:101 » IndexOutOfBounds
+[ERROR]   CatscriptFunctionArgsAndReturnEvalTest.listTypeArgWorksProperly:50->CatscriptTestBase.executeProgram:101 » IndexOutOfBounds
+[ERROR]   CatscriptFunctionArgsAndReturnEvalTest.listTypeWithComponentTypeArgWorksProperly:56->CatscriptTestBase.executeProgram:101 » IndexOutOfBounds
+[ERROR]   CatscriptFunctionArgsAndReturnEvalTest.mutliArgumentFunctionsWork:62->CatscriptTestBase.executeProgram:102 » ParseError
+[ERROR]   CatscriptFunctionArgsAndReturnEvalTest.noTypeArgWorksProperly:20->CatscriptTestBase.executeProgram:101 » IndexOutOfBounds
+[ERROR]   CatscriptFunctionArgsAndReturnEvalTest.objectTypeArgWorksProperly:26->CatscriptTestBase.executeProgram:101 » IndexOutOfBounds
+[ERROR]   CatscriptFunctionArgsAndReturnEvalTest.stringTypeArgWorksProperly:44->CatscriptTestBase.executeProgram:101 » IndexOutOfBounds
+[ERROR]   CatscriptFunctionArgsAndReturnEvalTest.voidFunctionWorksProperly:12->CatscriptTestBase.executeProgram:101 » IndexOutOfBounds
+[ERROR]   CatscriptStatementExecutionTest.functionDeclarationWorksProperly:66->CatscriptTestBase.executeProgram:102 » ParseError
+[ERROR]   CatscriptStatementExecutionTest.recursiveFunctionWorksProperly:75->CatscriptTestBase.executeProgram:101 » IndexOutOfBounds
+[INFO] 
+[ERROR] Tests run: 116, Failures: 0, Errors: 11, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.502 s
+[INFO] Finished at: 2021-04-20T10:00:58-06:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:2.22.1:test (default-test) on project CSCI_466_Project: There are test failures.
+[ERROR] 
+[ERROR] Please refer to /home/carson/Projects/msu/csci-466-spring2021/grading/scripts/repos/logan_ladd/target/surefire-reports for the individual test results.
+[ERROR] Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
